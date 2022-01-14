@@ -69,6 +69,40 @@ const showFileColors = (error, content) => {
   }
 };
 
+const showFileLint = (error, content) => {
+  if (error) {
+    console.log(error);
+  }
+
+  const split = content.split("\n");
+
+  let checkSemicolon = false;
+
+  const semiColonErrorLines = [];
+
+  // to go through each line
+  for (let i = 0; i < split.length; i += 1) {
+    let sentence = split[i];
+    if (checkSemicolon === false && sentence.indexOf("{") !== -1) {
+      checkSemicolon = true;
+    } else if (checkSemicolon === true && sentence.indexOf("}") !== -1) {
+      checkSemicolon = false;
+    } else if (checkSemicolon === true) {
+      if (sentence[sentence.length - 2] !== ',' && sentence[sentence.length - 2] !== ';') {
+        semiColonErrorLines.push(i + 1);
+      } 
+    }
+  }
+
+  console.log('-------');
+  console.log('semi colons missing on lines:');
+  console.log('-------');  
+
+  for (let i = 0; i < semiColonErrorLines.length; i += 1) {
+    console.log(`Line ${semiColonErrorLines[i]}`);
+  }
+};
+
 const addToColorObject = (color) => {
   if (color.length !== 1) {
     if (colorObject[color] === undefined) {
@@ -77,7 +111,7 @@ const addToColorObject = (color) => {
       colorObject[color] += 1;
     }
   }
-}
+};
 
 const addToStyleObject = (style) => {
   if (style.length !== 1) {
@@ -87,8 +121,12 @@ const addToStyleObject = (style) => {
       styleObject[style] += 1;
     }
   }
-}
+};
 
 export const showColors = (fileName) => {
   readFile(fileName, "utf8", showFileColors);
+};
+
+export const showLint = (fileName) => {
+  readFile(fileName, "utf8", showFileLint);
 };
