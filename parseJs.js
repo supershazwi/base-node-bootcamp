@@ -1,4 +1,5 @@
 import { readFile } from "fs";
+import { rgbToHex } from "./cssConvert.js";
 
 const colorObject = {};
 
@@ -11,17 +12,47 @@ const showFileColors = (error, content) => {
 
   // to go through each line
   for (let i = 0; i < split.length; i += 1) {
-    const sentence = split[i];
+    let sentence = split[i];
 
-    if (sentence.indexOf("color") !== -1) {
+    if (sentence.indexOf("#") !== -1) {
       // this is a function
       const hashIndex = sentence.indexOf("#");
-      const color = sentence.slice(hashIndex, sentence.indexOf(";"));
+      let color = sentence.slice(hashIndex, sentence.indexOf(";"));
 
-      if (colorObject[color] === undefined) {
-        colorObject[color] = 1;
-      } else {
-        colorObject[color] += 1;
+      const spaceIndex = color.indexOf(" ");
+
+      if (spaceIndex !== -1) {
+        color = color.slice(0, spaceIndex);
+      }
+
+      const commaIndex = color.indexOf(",");
+
+      if (commaIndex !== -1) {
+        color = color.slice(0, commaIndex);
+      }
+
+      if (color.length !== 1) {
+        if (colorObject[color] === undefined) {
+          colorObject[color] = 1;
+        } else {
+          colorObject[color] += 1;
+        }
+      }
+    }
+
+    if (sentence.indexOf("rgb(") !== -1) {
+      sentence = sentence.slice(sentence.indexOf("rgb("));
+      sentence = sentence.slice(0, sentence.indexOf(")"));
+      sentence += ")";
+
+      const color = rgbToHex(sentence);
+
+      if (color.length !== 1) {
+        if (colorObject[color] === undefined) {
+          colorObject[color] = 1;
+        } else {
+          colorObject[color] += 1;
+        }
       }
     }
   }
