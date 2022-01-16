@@ -1,5 +1,5 @@
-import { readFile } from "fs";
-import { rgbToHex } from "./cssConvert.js";
+import { readFile, writeFile } from "fs";
+import { rgbToHex, hexToRgb } from "./cssConvert.js";
 
 const colorObject = {};
 const styleObject = {};
@@ -52,17 +52,17 @@ const showFileColors = (error, content) => {
     }
   }
 
-  console.log('-------');
-  console.log('colours:');
-  console.log('-------');
+  console.log("-------");
+  console.log("colours:");
+  console.log("-------");
 
   for (const color in colorObject) {
     console.log(`${color}: ${colorObject[color]}`);
   }
 
-  console.log('-------');
-  console.log('styles:');
-  console.log('-------');
+  console.log("-------");
+  console.log("styles:");
+  console.log("-------");
 
   for (const style in styleObject) {
     console.log(`${style}: ${styleObject[style]}`);
@@ -88,19 +88,76 @@ const showFileLint = (error, content) => {
     } else if (checkSemicolon === true && sentence.indexOf("}") !== -1) {
       checkSemicolon = false;
     } else if (checkSemicolon === true) {
-      if (sentence[sentence.length - 2] !== ',' && sentence[sentence.length - 2] !== ';') {
+      if (
+        sentence[sentence.length - 2] !== "," &&
+        sentence[sentence.length - 2] !== ";"
+      ) {
         semiColonErrorLines.push(i + 1);
-      } 
+      }
     }
   }
 
-  console.log('-------');
-  console.log('semi colons missing on lines:');
-  console.log('-------');  
+  console.log("-------");
+  console.log("semi colons missing on lines:");
+  console.log("-------");
 
   for (let i = 0; i < semiColonErrorLines.length; i += 1) {
     console.log(`Line ${semiColonErrorLines[i]}`);
   }
+};
+
+const handleFileWrite = (err) => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+  // If no error, file written successfully
+  console.log("success!");
+};
+
+const convertHexToRgbFile = (error, content) => {
+  if (error) {
+    console.log(error);
+  }
+
+  const split = content.split("\n");
+
+  console.log(split.length);
+
+  for (let i = 0; i < split.length; i += 1) {
+    let sentence = split[i];
+
+    if (sentence.indexOf("#") !== -1) {
+      let style = sentence.slice(0, sentence.indexOf(":"));
+
+      // this is a function
+      const hashIndex = sentence.indexOf("#");
+      let color = sentence.slice(hashIndex, sentence.indexOf(";"));
+
+      const spaceIndex = color.indexOf(" ");
+
+      if (spaceIndex !== -1) {
+        color = color.slice(0, spaceIndex);
+      }
+
+      const commaIndex = color.indexOf(",");
+
+      if (commaIndex !== -1) {
+        color = color.slice(0, commaIndex);
+      }
+
+      const rgb = hexToRgb(color);
+
+      split[i] = `${style}: rgb(${rgb.r}, ${rgb.g}, ${rgb.b});`;
+    }
+  }
+
+  // for (let i = 0; i < split.length; i += 1) {
+  //   console.log(split[i]);
+  //   console.log("\n");
+  // }
+
+  writeFile("styles.css", split.join("\n"), handleFileWrite);
 };
 
 const addToColorObject = (color) => {
@@ -129,4 +186,8 @@ export const showColors = (fileName) => {
 
 export const showLint = (fileName) => {
   readFile(fileName, "utf8", showFileLint);
+};
+
+export const convertHexToRgb = (fileName) => {
+  readFile(fileName, "utf8", convertHexToRgbFile);
 };

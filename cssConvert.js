@@ -16,7 +16,7 @@ const decToHex = {
   15: "f",
 };
 
-export function hexToRgb(hex) {
+export const hexToRgb = (hex) => {
   console.log("converting hex to rgb...");
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
@@ -26,9 +26,9 @@ export function hexToRgb(hex) {
         b: parseInt(result[3], 16),
       }
     : null;
-}
+};
 
-export function rgbToHex(rgb) {
+export const rgbToHex = (rgb) => {
   console.log("converting rgb to hex...");
   rgb = rgb.slice(4, -1);
   const rgbPortions = rgb.split(",");
@@ -41,4 +41,4 @@ export function rgbToHex(rgb) {
   }
 
   return result;
-}
+};
