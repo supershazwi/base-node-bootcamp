@@ -180,6 +180,55 @@ const convertRgbToHexFile = (error, content) => {
   writeFile("styles.css", split.join("\n"), handleFileWrite);
 };
 
+const convertHexAndRgbFile = (error, content) => {
+  if (error) {
+    console.log(error);
+  }
+
+  const split = content.split("\n");
+
+  for (let i = 0; i < split.length; i += 1) {
+    let sentence = split[i];
+
+    if (sentence.indexOf("rgb(") !== -1) {
+      let style = sentence.slice(0, sentence.indexOf(":"));
+
+      // this is a function
+      const rgbIndex = sentence.indexOf("rgb(");
+
+      let color = sentence.slice(rgbIndex, sentence.indexOf(";"));
+
+      const hex = rgbToHex(color);
+
+      split[i] = `${style}: ${hex};`;
+    } else if (sentence.indexOf("#") !== -1) {
+      let style = sentence.slice(0, sentence.indexOf(":"));
+
+      // this is a function
+      const hashIndex = sentence.indexOf("#");
+      let color = sentence.slice(hashIndex, sentence.indexOf(";"));
+
+      const spaceIndex = color.indexOf(" ");
+
+      if (spaceIndex !== -1) {
+        color = color.slice(0, spaceIndex);
+      }
+
+      const commaIndex = color.indexOf(",");
+
+      if (commaIndex !== -1) {
+        color = color.slice(0, commaIndex);
+      }
+
+      const rgb = hexToRgb(color);
+
+      split[i] = `${style}: rgb(${rgb.r}, ${rgb.g}, ${rgb.b});`;
+    }
+  }
+
+  writeFile("styles.css", split.join("\n"), handleFileWrite);
+};
+
 const addToColorObject = (color) => {
   if (color.length !== 1) {
     if (colorObject[color] === undefined) {
@@ -214,4 +263,8 @@ export const convertHexToRgb = (fileName) => {
 
 export const convertRgbToHex = (fileName) => {
   readFile(fileName, "utf8", convertRgbToHexFile);
+};
+
+export const convertHexAndRgb = (fileName) => {
+  readFile(fileName, "utf8", convertHexAndRgbFile);
 };
