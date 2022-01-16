@@ -1,4 +1,5 @@
 const decToHex = {
+  0: "0",
   1: "1",
   2: "2",
   3: "3",
@@ -35,6 +36,7 @@ export const rgbToHex = (rgb) => {
   let result = "#";
 
   for (let i = 0; i < rgbPortions.length; i += 1) {
+    console.log(rgbPortions[i]);
     result += decToHex[Math.floor(rgbPortions[i] / 16)];
     result +=
       decToHex[(rgbPortions[i] / 16 - Math.floor(rgbPortions[i] / 16)) * 16];

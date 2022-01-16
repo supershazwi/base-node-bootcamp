@@ -122,8 +122,6 @@ const convertHexToRgbFile = (error, content) => {
 
   const split = content.split("\n");
 
-  console.log(split.length);
-
   for (let i = 0; i < split.length; i += 1) {
     let sentence = split[i];
 
@@ -152,10 +150,32 @@ const convertHexToRgbFile = (error, content) => {
     }
   }
 
-  // for (let i = 0; i < split.length; i += 1) {
-  //   console.log(split[i]);
-  //   console.log("\n");
-  // }
+  writeFile("styles.css", split.join("\n"), handleFileWrite);
+};
+
+const convertRgbToHexFile = (error, content) => {
+  if (error) {
+    console.log(error);
+  }
+
+  const split = content.split("\n");
+
+  for (let i = 0; i < split.length; i += 1) {
+    let sentence = split[i];
+
+    if (sentence.indexOf("rgb(") !== -1) {
+      let style = sentence.slice(0, sentence.indexOf(":"));
+
+      // this is a function
+      const rgbIndex = sentence.indexOf("rgb(");
+
+      let color = sentence.slice(rgbIndex, sentence.indexOf(";"));
+
+      const hex = rgbToHex(color);
+
+      split[i] = `${style}: ${hex};`;
+    }
+  }
 
   writeFile("styles.css", split.join("\n"), handleFileWrite);
 };
@@ -190,4 +210,8 @@ export const showLint = (fileName) => {
 
 export const convertHexToRgb = (fileName) => {
   readFile(fileName, "utf8", convertHexToRgbFile);
+};
+
+export const convertRgbToHex = (fileName) => {
+  readFile(fileName, "utf8", convertRgbToHexFile);
 };
